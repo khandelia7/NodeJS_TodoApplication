@@ -1,0 +1,24 @@
+{
+  "name": "8-lect",
+  "version": "1.0.0",
+  "description": "todo application (lect 8)",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "todo",
+    "list",
+    "mongoose",
+    "todo",
+    "api",
+    "mongodb"
+  ],
+  "author": "akash khandelia",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-validator": "^6.6.0",
+    "mongoose": "^5.9.22"
+  }
+}
