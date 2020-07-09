@@ -60,7 +60,7 @@ class UserOperation{
     await connectDb();
     let Operation=new UserOperation();
     //let data= await Operation.registerUser({});
-    let data= await Operation.checkLogin("khandelia7@gmail.com","password")
+    let data= await Operation.checkLogin("khandelia7@gmail.com","1234")
     console.log(data)
 })()
 

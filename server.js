@@ -2,6 +2,18 @@ const express=require("express");
 const app=express();
 
 const PORT= process.env.PORT || 3000;
+const connectDb=require('./config/db');
+
+// create connection request globally
+connectDb()
+
+// initialize middleware
+app.use(express.json({extended:false}))
+
+// define routes
+app.use('/api/task',require('./route/task'));
+
+// localhost:300/api/task/list/1
 
 app.listen(PORT,(error)=>{
     if(error){
@@ -9,4 +21,4 @@ app.listen(PORT,(error)=>{
     }else{
         console.log("Application running on port number ",PORT)
     }
-})
+})     
