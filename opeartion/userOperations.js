@@ -50,18 +50,4 @@ class UserOperation{
     }
 }
 
-
-// (async ()=>{
-//     let Operation=new UserOperation();
-//     let data= await Operation.checkLogin("thompson@gmail.com","password")
-//     console.log(data)
-// })();
-(async ()=>{
-    await connectDb();
-    let Operation=new UserOperation();
-    //let data= await Operation.registerUser({});
-    let data= await Operation.checkLogin("khandelia7@gmail.com","1234")
-    console.log(data)
-})()
-
 module.exports=UserOperation;
