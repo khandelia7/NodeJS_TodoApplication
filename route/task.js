@@ -2,10 +2,14 @@ const express=require("express");
 const router=express.Router();
 const TaskOperation=require('./../opeartion/TaskOperation');
 const { check, validationResult ,param} = require('express-validator');
+const auth=require("../middleware/auth");
 
 // @route get api/task/get-task/1
 // @desc get the list of task
-router.get('/get-task/:page',[param('page').isNumeric().withMessage("should be a number")],
+// Private route
+router.get('/list/:page',
+            auth,
+            [param('page').isNumeric().withMessage("should be a number")],
 async (req,res)=>{
     try{
         const {page}=req.params;    
@@ -15,7 +19,7 @@ async (req,res)=>{
             return res.status(400).json({"success":false,"error":validationError.errors})
         }
         let operation =new TaskOperation();
-        let taskList= await operation.getPaginationTaskList(page,10);
+        let taskList= await operation.getPaginationTaskList(page,10,req.user_id);
         res.status(200).json({
                 success:true,
                 task:taskList          
@@ -30,11 +34,13 @@ async (req,res)=>{
 
 // @route post api/task/insert-task
 // @desc insert record to the database
-router.post('/insert-task',[
-    check('status').isIn(['inprogress','complete','not_started'])
+// Private route
+router.post('/insert-task',
+        auth,
+        [ check('status').isIn(['inprogress','complete','not_started'])
                    .withMessage("status should be either one of inprogress,complete,not_started"),
-    check('title').not().isEmpty().withMessage("Please pass the title")
-],async (req,res)=>{
+           check('title').not().isEmpty().withMessage("Please pass the title") ],
+async (req,res)=>{
     try {
         // validate the request
         let validationError= validationResult(req);
@@ -48,7 +54,7 @@ router.post('/insert-task',[
         let operation =new TaskOperation();
         const {title,status}=req.body;
         // insert the record
-        let insertedTask= await operation.insertTask(title,status);
+        let insertedTask= await operation.insertTask(title,status,req.user_id);
         res.status(200).json({
                 success:true,
                 task:insertedTask        
@@ -64,7 +70,10 @@ router.post('/insert-task',[
 
 // @route delete api/task/delete-id/:id
 // @desc delete record to the database
-router.delete('/delete-id/:id',[param('id').isMongoId().withMessage("Please pass a valid ID")],
+// Private route
+router.delete('/delete-id/:id',
+                auth,
+                [param('id').isMongoId().withMessage("Please pass a valid ID")],
 async (req,res)=>{
     try{
         const {id}=req.params;    
@@ -74,7 +83,7 @@ async (req,res)=>{
             return res.status(400).json({"success":false,"error":validationError.errors})
         }
         let operation =new TaskOperation();
-        let result= await operation.removeTask(id);
+        let result= await operation.removeTask(id,req.user_id);
         if(!result.isdeleted){
             return res.status(400).json({"success":false,error:result.error})
         }
@@ -90,11 +99,15 @@ async (req,res)=>{
     }    
 })
 
-// @route put api/task/update-id/:id
+// @route put api/task/update-task/:id
 // @desc update record to the database
-router.put('/update-id/:id',[param('id').isMongoId().withMessage("Please pass a valid ID")],
+router.put('/update-task/:id',
+            auth,
+            [param('id').isMongoId().withMessage("Please pass a valid ID"),
+                check('status').optional().isIn(['inprogress','complete','not_started'])
+                .withMessage("status should be either one of inprogress,complete,not_started"),
+                check('title').optional().not().isEmpty().withMessage("Please pass the title") ],
 async (req,res)=>{
-
     try{
         // validate the request
         const {id}=req.params;    
@@ -113,7 +126,7 @@ async (req,res)=>{
         if (status) updatedTask.status=status;
         
         let operation =new TaskOperation();
-        let result= await operation.updateTask(updatedTask);
+        let result= await operation.updateTask(updatedTask, req.user_id);
         // build result based on result
         if(!result.isUpdated){
             return res.status(400).json({"success":false,error:result.error})

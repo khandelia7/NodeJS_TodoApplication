@@ -5,6 +5,8 @@ const express=require("express");
 const router=express.Router();
 const UserOperation=require('./../opeartion/userOperations');
 const { check, validationResult ,param} = require('express-validator');
+const jwt=require("jsonwebtoken");
+const config=require('../config/config');
 
 // @route post api/user/register
 // @desc insert record to the database
@@ -19,7 +21,7 @@ router.post('/register',[
         if(!validationError.isEmpty()){
             res.status(400).json({
                 "success":false,
-                "message":validationError.errors
+                "message":validationError
             });
             return
         }
@@ -33,7 +35,7 @@ router.post('/register',[
                 user:insertedTask        
         });
     } catch (error) {
-        console.log(typeof error,error.message);
+        console.log(typeof error,error);
         res.status(500).json({
             "success":false,
             "error":error.message
@@ -59,6 +61,7 @@ router.post('/login',[
         }
         let operation =new UserOperation();
         const {email,password}=req.body;
+        
         // check for login
         let verifiedUser= await operation.checkLogin(email,password);
         
@@ -66,10 +69,20 @@ router.post('/login',[
            return res.status(400).json({success:false,error:verifiedUser.error});
         }
 
-        res.status(200).json({
+        //define our jwt token
+        let payload={
+            user_id:verifiedUser.data.id
+        }
+
+        // generate the token with the payload
+        jwt.sign(payload,config.jsonwebtokenPassword,{expiresIn:36000},(error,token)=>{
+            if(error) throw error
+            res.status(200).json({
                 success:true,
-                user:verifiedUser.data.id        
-        });
+                token:token       
+            });
+        })
+        
     } catch (error) {
         res.status(500).json({
             "success":false,
@@ -77,4 +90,5 @@ router.post('/login',[
         })
     }
 })
+
 module.exports=router;
