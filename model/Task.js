@@ -1,4 +1,5 @@
 const mongoose=require('mongoose');
+
 // define the collection struc
 const TaskSchema= mongoose.Schema({
     title:{
@@ -19,5 +20,6 @@ const TaskSchema= mongoose.Schema({
         default:Date.now
     }
 });
+
 // creating the collection
 module.exports=mongoose.model("tasks",TaskSchema)

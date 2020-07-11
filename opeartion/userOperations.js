@@ -1,6 +1,7 @@
-const UserModel=require('../model/Users');
 const connectDb=require('../config/db');
-
+const UserModel=require('../model/users');
+// const jwt=require('jsonwebtoken')
+// const bcrypt=require('bcryptjs');
 class UserOperation{
 
     constructor(){
@@ -8,9 +9,7 @@ class UserOperation{
 
     // register the user 
     async registerUser(user){
-        user={name:"Akash",email:"khandelia7@gmail.com",password:"1234"}
-            // if the user exists thorw error
-            // register the user
+        // register the user
             try {
                 let anyUser= await UserModel.findOne({email:user.email});
                 if(anyUser){
@@ -23,7 +22,8 @@ class UserOperation{
                         password:user.password,
                         name:user.name
                     });
-
+                    // const salt=await bcrypt.genSalt(10);
+                    // newUser.password=await bcrypt.hash(user.password,salt)
                     await newUser.save();
                     return {name:user.name,email:user.email};
                 }
@@ -40,14 +40,15 @@ class UserOperation{
             try {
                    let user= await UserModel.findOne({email:email, password:password});
                    if(!user){
-                        throw new Error("Username or password invalid")
+                        return {isVerified:false,error:"invalid credentials"};
                    }else{
-                       return user;
+                       return {isVerified:true,data:user};
                    }
             } catch (error) {
                 throw new Error("Username or password invalid")
             }
     }
+
 }
 
 module.exports=UserOperation;

@@ -12,6 +12,7 @@ app.use(express.json({extended:false}))
 
 // define routes
 app.use('/api/task',require('./route/task'));
+app.use('/api/user',require('./route/user'));
 
 // localhost:300/api/task/list/1
 
@@ -21,4 +22,4 @@ app.listen(PORT,(error)=>{
     }else{
         console.log("Application running on port number ",PORT)
     }
-})     
+})  
